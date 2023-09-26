@@ -31,7 +31,11 @@ class PythonprojectPipeline:
         price_keys = ['price', 'price_excl_tax', 'price_incl_tax', 'tax']
         for price_key in price_keys:
             value = adapter.get(price_key)
+<<<<<<< HEAD
             value = value.replace('£', '')
+=======
+            value = value.replace('GBP', '')
+>>>>>>> 0602ea0d31943be32933ca517f5b44f685d2ad4d
             adapter[price_key] = float(value)
 
         # Availability --> extract only the number in stock
