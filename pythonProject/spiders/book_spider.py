@@ -8,6 +8,12 @@ class BookSpiderSpider(scrapy.Spider):
     allowed_domains = ["books.toscrape.com"]
     start_urls = ["https://books.toscrape.com"]  # spider goes to this start url
 
+    custom_settings = {
+        'FEEDS': {
+            'books_data.json': {'format': 'json', 'overwrite': True}
+        }
+    }
+
     def parse(self, response):  # response is caught by the parse function
         books = response.css('article.product_pod')  # retrieves all books in main page
         for book in books:  # loops until there are no more books in the webpage, then follows next_page if it exists
@@ -41,7 +47,7 @@ class BookSpiderSpider(scrapy.Spider):
         book_item['num_reviews'] = table_rows[6].css("td ::text").get()
         book_item['stars'] = response.css('p.star-rating').attrib['class']
         book_item['category'] = response.xpath("//ul[@class='breadcrumb']/li[@class='active']/preceding-sibling::li["
-                                              "1]/a/text()").get()
+                                               "1]/a/text()").get()
         book_item['description'] = response.xpath("//div[@id='product_description']/following-sibling::p/text()").get()
         book_item['price'] = response.css('p.price_color ::text').get()
 

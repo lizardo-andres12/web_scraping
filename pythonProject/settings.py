@@ -12,6 +12,9 @@ BOT_NAME = "pythonProject"
 SPIDER_MODULES = ["pythonProject.spiders"]
 NEWSPIDER_MODULE = "pythonProject.spiders"
 
+FEEDS = {
+    'books_data.json': {'format': 'json'}
+}
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "pythonProject (+http://www.yourdomain.com)"
@@ -64,6 +67,7 @@ ROBOTSTXT_OBEY = True
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "pythonProject.pipelines.PythonprojectPipeline": 300,
+    "pythonProject.pipelines.SaveToMySQLPipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -31,11 +31,7 @@ class PythonprojectPipeline:
         price_keys = ['price', 'price_excl_tax', 'price_incl_tax', 'tax']
         for price_key in price_keys:
             value = adapter.get(price_key)
-<<<<<<< HEAD
             value = value.replace('£', '')
-=======
-            value = value.replace('GBP', '')
->>>>>>> 0602ea0d31943be32933ca517f5b44f685d2ad4d
             adapter[price_key] = float(value)
 
         # Availability --> extract only the number in stock
@@ -69,3 +65,91 @@ class PythonprojectPipeline:
 
         return item
 
+
+import mysql.connector
+
+
+class SaveToMySQLPipeline:
+
+    def __init__(self):
+        self.conn = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='Blue982004??',
+            database='books'
+        )
+
+        # Create cursor, used to execute commands
+        self.cur = self.conn.cursor()
+
+        # Creates table if there is none (in SQL)
+        self.cur.execute("""
+        CREATE TABLE IF NOT EXISTS books(
+            id int NOT NULL auto_increment,
+            url VARCHAR(255),
+            title text,
+            product_type VARCHAR(255),
+            price_excl_tax DECIMAL,
+            price_incl_tax DECIMAL,
+            tax DECIMAL,
+            price DECIMAL,
+            availability INTEGER,
+            num_reviews INTEGER,
+            stars INTEGER,
+            category VARCHAR(255),
+            description text,
+            PRIMARY KEY (id)
+        )
+        """)
+
+    def process_item(self, item, spider):
+        # Define insert statement
+        self.cur.execute(""" insert into books (
+            url,
+            title,
+            product_type,
+            price_excl_tax,
+            price_incl_tax,
+            tax,
+            price,
+            availability,
+            num_reviews,
+            stars,
+            category,
+            description
+            ) values (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
+                )""", (
+            item["url"],
+            item["title"],
+            item["product_type"],
+            item["price_excl_tax"],
+            item["price_incl_tax"],
+            item["tax"],
+            item["price"],
+            item["availability"],
+            item["num_reviews"],
+            item["stars"],
+            item["category"],
+            str(item["description"])
+        ))
+
+        # Execute insertion
+        self.conn.commit()
+        return item
+
+    def close_spider(self, spider):
+        # Close connection and write functionality to mySQL database
+        self.cur.close()
+        self.conn.close()
